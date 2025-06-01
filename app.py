@@ -118,8 +118,7 @@ st.markdown("### 📋 Ticker RSI Summary")
 for alert in compact_alerts:
     st.markdown(f"- {alert}")
 
-st.markdown(f"### 🌎 Overall Average
-ALL ({overall_5m:.1f} / {overall_15m:.1f}) → {overall_tag}")
+st.markdown(f"### 🌎 Overall Average\nALL ({overall_5m:.1f} / {overall_15m:.1f}) → {overall_tag}")
 
 df = pd.DataFrame({
     '5m_RSI': st.session_state.rsi5_list,
