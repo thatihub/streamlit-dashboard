@@ -4,10 +4,9 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from streamlit_autorefresh import st_autorefresh
 
-st.set_page_config(page_title="RSI + Price Dashboard", layout="wide")
+st.set_page_config(page_title="RSI + Price Dashboard (Upload File)", layout="wide")
 REFRESH_INTERVAL = 60
 st_autorefresh(interval=REFRESH_INTERVAL * 1000, limit=None, key="dashboardrefresh")
 
@@ -15,22 +14,21 @@ st.markdown(
     """
     <style>
     .main { background-color: #121212; color: #E0E0E0; }
-    .css-1d391kg { background-color: #121212; }
     .stButton>button { background-color: #333 !important; color: #EEE !important; }
     </style>
     """, unsafe_allow_html=True)
 
 plt.style.use('dark_background')
-script_dir = os.path.dirname(os.path.abspath(__file__))
-txt_files = [f for f in os.listdir(script_dir) if f.endswith('.txt')]
 
-if not txt_files:
-    st.error(f"❌ No .txt files found in {script_dir}. Please add at least one ticker file.")
+uploaded_file = st.file_uploader("📂 Upload your ticker .txt file", type="txt")
+
+if uploaded_file is not None:
+    content = uploaded_file.read().decode('utf-8')
+    TICKERS = [line.strip() for line in content.splitlines() if line.strip()]
+    st.success(f"✅ Loaded {len(TICKERS)} tickers from uploaded file.")
+else:
+    st.error("❌ Please upload a .txt file with tickers to continue.")
     st.stop()
-
-selected_file = st.sidebar.selectbox("📂 Select ticker file", txt_files)
-with open(os.path.join(script_dir, selected_file), 'r') as f:
-    TICKERS = [line.strip() for line in f if line.strip()]
 
 MAX_HISTORY = 100
 
@@ -60,7 +58,7 @@ if 'rsi15_list' not in st.session_state:
 if 'price_list' not in st.session_state:
     st.session_state.price_list = []
 
-st.title(f"🌙 RSI + Average Price Dashboard ({selected_file})")
+st.header(f"🌙 RSI + Average Price Dashboard (Uploaded File)")
 
 avg_rsi_5m, avg_rsi_15m, avg_prices, compact_alerts = [], [], [], []
 
